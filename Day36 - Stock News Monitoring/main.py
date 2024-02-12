@@ -1,5 +1,7 @@
 import requests
 import datetime as dt
+import os
+from twilio.rest import Client
 
 # Company's data
 STOCK_NAME = "TSLA"
@@ -10,12 +12,21 @@ STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
 # API Keys
-news_api_key = '8dba7e4727ff4852b3f1f716dccf83ed'
-stock_api_key = 'AZFKY1Q438T7ISRY'
+news_api_key = os.environ.get('NEWS_API_KEY')
+stock_api_key = os.environ.get('STOCK_API_KEY')
+twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 
 # Relevant dates
-yesterday = (dt.datetime.now() - dt.timedelta(1)).strftime('%Y-%m-%d')
-before_yesterday = (dt.datetime.now() - dt.timedelta(2)).strftime('%Y-%m-%d')
+if dt.datetime.now().weekday() == 0:
+    yesterday = (dt.datetime.now() - dt.timedelta(3)).strftime('%Y-%m-%d')
+    before_yesterday = (dt.datetime.now() - dt.timedelta(4)).strftime('%Y-%m-%d')
+elif dt.datetime.now().weekday() == 6:
+    yesterday = (dt.datetime.now() - dt.timedelta(2)).strftime('%Y-%m-%d')
+    before_yesterday = (dt.datetime.now() - dt.timedelta(3)).strftime('%Y-%m-%d')
+else:
+    yesterday = (dt.datetime.now() - dt.timedelta(1)).strftime('%Y-%m-%d')
+    before_yesterday = (dt.datetime.now() - dt.timedelta(2)).strftime('%Y-%m-%d')
 
 # Parameters
 stock_params = {
@@ -48,25 +59,39 @@ diff_stock_price = round(abs(yesterday_close_price - before_yesterday_close_pric
 perc_diff_stock_price = diff_stock_price / before_yesterday_close_price
 
 # If TODO4 percentage is greater than 5 then print("Get News").
-if perc_diff_stock_price > 5:
+if perc_diff_stock_price > 1:
     print('Get news')
 
-#TODO 6. - Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
+# Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
 news_response = requests.get(NEWS_ENDPOINT, params= news_params)
 news_data = news_response.json()
-#TODO 7. - Use Python slice operator to create a list that contains the first 3 articles. Hint: https://stackoverflow.com/questions/509211/understanding-slice-notation
-top3_news = news_data['articles'][:2]
-
-    ## STEP 3: Use twilio.com/docs/sms/quickstart/python
-    #to send a separate message with each article's title and description to your phone number. 
+# Use Python slice operator to create a list that contains the first 3 articles. Hint:
+# https://stackoverflow.com/questions/509211/understanding-slice-notation
+top3_news = news_data['articles'][:3]
 
 #TODO 8. - Create a new list of the first 3 article's headline and description using list comprehension.
+top3_headlines_descriptions = [ (top3_news[num]['title'],top3_news[num]['description']) for num in range(0,3)]
 
 #TODO 9. - Send each article as a separate message via Twilio. 
 
+# Find your Account SID and Auth Token at twilio.com/console
+# and set the environment variables. See http://twil.io/secure
+account_sid = twilio_account_sid
+auth_token = twilio_auth_token
+client = Client(account_sid, auth_token)
+
+for i in range(0,len(top3_headlines_descriptions)):
+    message = client.messages \
+                    .create(
+                         body=f"{STOCK_NAME}: {perc_diff_stock_price}\n"
+                              f"Headline: {top3_headlines_descriptions[i][0]}\n"
+                              f"Brief: {top3_headlines_descriptions[i][1]}",
+                         from_=os.environ.get('TWILIO_TEL_NUM'),
+                         to=os.environ.get('PERSONAL_TEL_NUM')
+                     )
 
 
-#Optional TODO: Format the message like this: 
+#Optional: Format the message like this:
 """
 TSLA: 🔺2%
 Headline: Were Hedge Funds Right About Piling Into Tesla Inc. (TSLA)?. 
