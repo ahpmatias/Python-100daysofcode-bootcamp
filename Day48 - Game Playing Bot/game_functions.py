@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import threading
+import schedule
+
 
 class GameFunctions:
 
@@ -10,6 +11,7 @@ class GameFunctions:
         self.chrome_options = webdriver.ChromeOptions()
         self.chrome_options.add_experimental_option('detach', True)
         self.driver = webdriver.Chrome(options=self.chrome_options)
+        self.SECONDS = 5
 
     def get_store_values(self):
         buy_cursor = self.driver.find_element(By.CSS_SELECTOR, value='#buyCursor b').text
@@ -42,7 +44,7 @@ class GameFunctions:
         buy_tmachine = self.driver.find_element(By.CSS_SELECTOR, value='div[id="buyTime machine"] b').text
         buy_tmachine = buy_tmachine.split(' ')
         buy_tmachine = int(buy_tmachine[3].split(',')[0] + buy_tmachine[3].split(',')[0] + buy_tmachine[3].split
-                           (',')[0])
+        (',')[0])
 
         store_values = [buy_cursor, buy_grandma, buy_factory, buy_mine, buy_shipment, buy_lab, buy_portal,
                         buy_tmachine]
@@ -64,6 +66,7 @@ class GameFunctions:
         return money
 
     def check_store(self):
+
         money = self.get_money_amount()
         store_values = self.get_store_values()
         store_values.reverse()
@@ -71,8 +74,8 @@ class GameFunctions:
         for index, item in enumerate(store_values):
 
             if money > item:
-                try:
-                    click_on = self.driver.find_element(By.CSS_SELECTOR, value=f'div[id="{self.STORE_IDS[index]}"]')
-                    click_on.click()
-                except TypeError:
-                    pass
+                click_on = self.driver.find_element(By.CSS_SELECTOR, value=f'div[id="{self.STORE_IDS[index]}"]')
+                click_on.click()
+
+    def scheduler(self):
+        schedule.every(self.SECONDS).seconds.do(job_func=self.check_store())

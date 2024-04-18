@@ -1,8 +1,7 @@
-from selenium import webdriver
+import schedule
+import time
 from selenium.webdriver.common.by import By
 from game_functions import GameFunctions
-import time
-import threading
 
 new_game = GameFunctions()
 
@@ -15,17 +14,17 @@ cookie = new_game.driver.find_element(By.ID, value='cookie')
 game_continues = True
 
 minutes = 5
-abort_after = 20
+abort_after = minutes * 60
 start = time.time()
-
-
 
 while game_continues:
 
-    # delta = time.time() - start
-    # if delta >= abort_after:
-    #     game_continues = False
+    delta = time.time() - start
+    if delta >= abort_after:
+        game_continues = False
 
     cookie.click()
-    check_store_thread = threading.Timer(5, new_game.check_store())
-    check_store_thread.start()
+    new_game.scheduler()
+    new_game.check_store()
+
+
