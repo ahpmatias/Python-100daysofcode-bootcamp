@@ -1,5 +1,5 @@
 # 100 days of code Python Bootcamp
-##### Provided by Dr. Angela Yu, through Udemy
+##### Course provided by Dr. Angela Yu, through Udemy
 
 ### Repo author: Anderson H. P. Matias
 
