@@ -1,0 +1,14 @@
+/shelf/
+/workspace.xml
+venv/
+Challenge 32 - SMTP Library/mail_merging/.DS_Store
+Challenge 32 - SMTP Library/mail_merging/Input/.DS_Store
+Challenge 32 - SMTP Library/mail_merging/Output/.DS_Store
+.idea/100daysofcode-bootcamp.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+Challenge 46 - Spotify Playlist automation/.cache
+Challenge 48 - Game Playing Bot/__pycache__/game_functions.cpython-38.pyc
+Challenge 54 - Web Dev with Flask & Python Decorators/__pycache__/hello.cpython-311.pyc
