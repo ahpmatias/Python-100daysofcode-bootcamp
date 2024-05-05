@@ -41,18 +41,18 @@ window.config(bg=BACKGROUND_COLOR, padx=50, pady=50)
 flip_timer = window.after(3000, func=flip_card)
 
 # Buttons
-wrong_button_image = PhotoImage(file='./images/wrong.png')
+wrong_button_image = PhotoImage(file='./static/static/images/wrong.png')
 wrong_button = Button(image=wrong_button_image, highlightthickness=0, relief='flat', borderwidth=0,
                       command=get_new_card)
 wrong_button.grid(column=0, row=1)
 
-right_button_image = PhotoImage(file='./images/right.png')
+right_button_image = PhotoImage(file='./static/static/images/right.png')
 right_button = Button(image=right_button_image, highlightthickness=0, relief='flat', borderwidth=0,
                       command=is_known)
 right_button.grid(column=1, row=1)
 
-front_card_image = PhotoImage(file='./images/card_front.png')
-back_card_image = PhotoImage(file='./images/card_back.png')
+front_card_image = PhotoImage(file='./static/static/images/card_front.png')
+back_card_image = PhotoImage(file='./static/static/images/card_back.png')
 
 canvas = Canvas(width=800, height=526, relief='flat', borderwidth=0, bg=BACKGROUND_COLOR, highlightthickness=0)
 img_container = canvas.create_image(400, 263, image=front_card_image)
