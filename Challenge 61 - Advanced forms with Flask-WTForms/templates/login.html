@@ -2,13 +2,16 @@
 
 <html>
 	<head>
-		<title>Login</title>
+		{% extends "base.html" %}
+		{% from 'bootstrap5/form.html' import render_form %}
+		<title>{% block title %}Login{% endblock %}</title>
 	</head>
 	<body>
+		{% block content %}
         <div class="container">
 		<h1>Login</h1>
         <!-- This is where our form will go. -->
-			<form method="POST" action="{{ url_for('login') }}" novalidate>
+			<!-- <form method="POST" action="{{ url_for('login') }}" novalidate>
 				{{ form.csrf_token }}
 				<p>
 					{{ form.email.label }} <br> {{ form.email(size=30) }}
@@ -23,7 +26,9 @@
 					{% endfor %}
 				</p>	
 				{{ form.submit }}
-		</form>
+		</form> -->
+		{{ render_form(form) }}
         </div>
+		{% endblock %}
 	</body>
 </html>
