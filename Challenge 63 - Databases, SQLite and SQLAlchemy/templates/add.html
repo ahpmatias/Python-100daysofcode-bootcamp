@@ -5,14 +5,7 @@
     <title>Add Book</title>
   </head>
   <body>
-    <form action="" method="POST">
-      <label>Book Name</label>
-      <input type="text" />
-      <label>Book Author</label>
-      <input type="text" />
-      <label>Rating</label>
-      <input type="text" />
-      <button type="submit">Add Book</button>
-    </form>
+    {% from 'bootstrap5/form.html' import render_form %}
+    {{ render_form(form) }}
   </body>
 </html>
