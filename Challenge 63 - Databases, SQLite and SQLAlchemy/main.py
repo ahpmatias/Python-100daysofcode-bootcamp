@@ -69,7 +69,9 @@ def add():
         #     }
         # all_books.append(form_data)
         with app.app_context():
-            new_book = Book(title=request.form.get('title'), author=request.form.get('author'), rating=request.form.get('rating'))
+            new_book = Book(title=request.form.get('title'), 
+                            author=request.form.get('author'), 
+                            rating=request.form.get('rating'))
             db.session.add(new_book)
             db.session.commit()
         return redirect(url_for('home'))
