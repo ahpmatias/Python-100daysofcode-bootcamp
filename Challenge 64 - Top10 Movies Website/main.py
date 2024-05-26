@@ -117,31 +117,27 @@ def delete():
     return redirect(url_for('home'))
 
 
-@app.route('/add', methods=['GET','POST'])
+@app.route('/add', methods=["GET", "POST"])
 def add_movie():
     add_movie_form = AddMovieForm()
     tmdb_api_key = 'eb5084da6bf7f059e44754b690d36d9c'
     search_movie_endpoint = 'https://api.themoviedb.org/3/search/movie'
 
-    headers = {
-    "accept": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYjUwODRkYTZiZjdmMDU5ZTQ0NzU0YjY5MGQzNmQ5YyIsInN1YiI6IjY2NTJlNWVkMDk0NjJhZWYwMzcxYWFhNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KhV-gE62VmNpPmnb6wkksk6mjZbGb7zwiGQ_-Xamiyg"
-    }
-    params = {
-        'query': request.form.get('title')
-    }
-    response = requests.get(url=search_movie_endpoint, headers=headers, params=params)
-    
+    # headers = {
+    # "accept": "application/json",
+    # "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYjUwODRkYTZiZjdmMDU5ZTQ0NzU0YjY5MGQzNmQ5YyIsInN1YiI6IjY2NTJlNWVkMDk0NjJhZWYwMzcxYWFhNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KhV-gE62VmNpPmnb6wkksk6mjZbGb7zwiGQ_-Xamiyg"
+    # }
     if add_movie_form.validate_on_submit():
-        new_movie = Movie(rating=request.form.get('rating'), 
-                        review=request.form.get('review')
-                        )
-        db.session.add(new_movie)
-        db.session.commit()
-        return redirect(url_for('home'))
+        movie_query = add_movie_form.title.data
+        params = {
+            'query': movie_query,
+            'api_key':tmdb_api_key
+        }
+        response = requests.get(url=search_movie_endpoint, params=params)
+        data = response.json()['results']
+        return render_template('select.html', options=data)
 
     return render_template('add.html', form=add_movie_form)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
