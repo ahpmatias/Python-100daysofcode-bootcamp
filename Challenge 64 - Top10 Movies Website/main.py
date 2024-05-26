@@ -30,6 +30,10 @@ class RateMovieForm(FlaskForm):
     review = StringField('Your Review', validators=[DataRequired()])
     submit = SubmitField('Done')
 
+class AddMovieForm(FlaskForm):
+    title = StringField('Movie Title', validators=[DataRequired()])
+    submit = SubmitField('Add Movie')
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -66,8 +70,8 @@ with app.app_context():
 #                         review="My favourite character was the caller.",
 #                         img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
 # )
-            # db.session.add(new_movie)
-            # db.session.commit()
+#             db.session.add(new_movie)
+#             db.session.commit()
 
 # ADD SECOND ENTRY ON DATABASE
 # with app.app_context():
@@ -91,45 +95,52 @@ def home():
 
 @app.route('/edit', methods=['GET','POST'])
 def edit_rating():
-    rate_movie_form = RateMovieForm()
-    movie_id = request.args.get("id")
-    movie_to_update = db.get_or_404(Movie, movie_id)   
+    rate_movie_form = RateMovieForm()  
+    movie_id = request.args.get('id')
+    movie_selected = db.get_or_404(Movie, movie_id)
     if rate_movie_form.validate_on_submit():  
-        movie_to_update.rating = request.form.get('rating')
-        movie_to_update.review = request.form.get('review')
+        movie_selected.rating = request.form.get('rating')
+        movie_selected.review = request.form.get('review')
         db.session.commit()  
 
-        return redirect(url_for('home'))
-    
-    # if request.method == "POST":
-    #     movie_id = request.form["id"]
-    #     movie_to_update = db.get_or_404(Movie, movie_id)
-    #     movie_to_update.rating = request.form["rating"]
-    #     movie_to_update.review = request.form["review"]
-    #     db.session.commit()
-
-    #     return redirect(url_for('home'))
-    
-    movie_id = request.args.get('id')
-    
-    movie_selected = db.get_or_404(Movie, movie_id)
-    
+        return redirect(url_for('home'))  
     
     return render_template("edit.html", form=rate_movie_form, movie=movie_selected, id=movie_id)
+
+@app.route('/delete', methods=['GET','POST'])
+def delete():
+    movie_id = request.args.get("id")
+    movie_to_delete = db.get_or_404(Movie, movie_id)
+    db.session.delete(movie_to_delete)
+    db.session.commit()
+
+    return redirect(url_for('home'))
+
+
+@app.route('/add', methods=['GET','POST'])
+def add_movie():
+    add_movie_form = AddMovieForm()
+    tmdb_api_key = 'eb5084da6bf7f059e44754b690d36d9c'
+    search_movie_endpoint = 'https://api.themoviedb.org/3/search/movie'
+
+    headers = {
+    "accept": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYjUwODRkYTZiZjdmMDU5ZTQ0NzU0YjY5MGQzNmQ5YyIsInN1YiI6IjY2NTJlNWVkMDk0NjJhZWYwMzcxYWFhNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.KhV-gE62VmNpPmnb6wkksk6mjZbGb7zwiGQ_-Xamiyg"
+    }
+    params = {
+        'query': request.form.get('title')
+    }
+    response = requests.get(url=search_movie_endpoint, headers=headers, params=params)
     
+    if add_movie_form.validate_on_submit():
+        new_movie = Movie(rating=request.form.get('rating'), 
+                        review=request.form.get('review')
+                        )
+        db.session.add(new_movie)
+        db.session.commit()
+        return redirect(url_for('home'))
 
-# @app.route('/add', methods=['GET','POST'])
-# def add_movie():
-#     rate_movie_form = RateMovieForm()
-#     if rate_movie_form.validate_on_submit():
-#         new_rating = Movie(rating=request.form.get('rating'), 
-#                         review=request.form.get('review')
-#                         )
-#         db.session.add(new_rating)
-#         db.session.commit()
-#         return redirect(url_for('home'))
-
-#     return render_template('add.html', form=rate_movie_form)
+    return render_template('add.html', form=add_movie_form)
 
 
 if __name__ == '__main__':
