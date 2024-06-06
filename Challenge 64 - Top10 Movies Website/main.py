@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField, IntegerField
 from wtforms.validators import DataRequired
 import requests
+from datetime import datetime
 
 '''
 Red underlines? Install the required packages first: 
@@ -50,9 +51,9 @@ class Movie(db.Model):
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     year: Mapped[str] = mapped_column(String(250), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
-    rating: Mapped[float] = mapped_column(Float, nullable=False)
-    ranking: Mapped[int] = mapped_column(Integer, nullable=False)
-    review: Mapped[str] = mapped_column(String(250), nullable=False)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
+    ranking: Mapped[int] = mapped_column(Integer)
+    review: Mapped[str] = mapped_column(String(250))
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
@@ -117,7 +118,7 @@ def delete():
     return redirect(url_for('home'))
 
 
-@app.route('/add', methods=["GET", "POST"])
+@app.route('/add', methods=['GET','POST'])
 def add_movie():
     add_movie_form = AddMovieForm()
     tmdb_api_key = 'eb5084da6bf7f059e44754b690d36d9c'
@@ -138,6 +139,30 @@ def add_movie():
         return render_template('select.html', options=data)
 
     return render_template('add.html', form=add_movie_form)
+
+@app.route('/confirm', methods=['GET','POST'])
+def confirm_movie():
+    movie_id = request.args.get('id')
+    if movie_id:
+        print(movie_id)
+        tmdb_api_key = 'eb5084da6bf7f059e44754b690d36d9c'
+        details_endpoint = f'https://api.themoviedb.org/3/movie/{movie_id}'
+        response = requests.get(url=details_endpoint, params={'api_key':tmdb_api_key})
+        data = response.json()
+        print(data)
+        selected_movie = Movie(
+                    title=data['original_title'],
+                    year=int(datetime.strptime(data['release_date'], '%Y-%m-%d').strftime('%Y')),
+                    rating=0,
+                    ranking=0,
+                    review='',
+                    description=data['overview'],
+                    img_url=f"https://image.tmdb.org/t/p/w500{data['poster_path']}"
+        )
+        db.session.add(selected_movie)
+        db.session.commit()
+
+    return redirect(url_for('edit_rating', id=selected_movie.id))
 
 if __name__ == '__main__':
     app.run(debug=True)
