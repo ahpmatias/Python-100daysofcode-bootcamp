@@ -88,10 +88,17 @@ with app.app_context():
 #     db.session.add(second_movie)
 #     db.session.commit()
 
-@app.route("/")
+@app.route("/", methods=['GET','POST'])
 def home():
-    result = db.session.execute(db.select(Movie).order_by(Movie.ranking))
+    result = db.session.execute(db.select(Movie).order_by(Movie.rating))
+    print(result)
     all_movies = result.scalars().all()
+    rank_score = len(all_movies)
+    for movie in all_movies:
+        movie.ranking = rank_score
+        rank_score -= 1
+        db.session.commit()
+
     return render_template('index.html', movies=all_movies)
 
 @app.route('/edit', methods=['GET','POST'])
@@ -144,12 +151,10 @@ def add_movie():
 def confirm_movie():
     movie_id = request.args.get('id')
     if movie_id:
-        print(movie_id)
         tmdb_api_key = 'eb5084da6bf7f059e44754b690d36d9c'
         details_endpoint = f'https://api.themoviedb.org/3/movie/{movie_id}'
         response = requests.get(url=details_endpoint, params={'api_key':tmdb_api_key})
         data = response.json()
-        print(data)
         selected_movie = Movie(
                     title=data['original_title'],
                     year=int(datetime.strptime(data['release_date'], '%Y-%m-%d').strftime('%Y')),
