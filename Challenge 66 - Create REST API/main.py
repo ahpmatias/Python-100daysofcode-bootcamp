@@ -62,9 +62,14 @@ def home():
 def random_cafe():
     result = db.session.execute(db.select(Cafe))
     all_cafes = result.scalars().all()
-    print(all_cafes)
     random_cafe = random.choice(all_cafes)
     return jsonify(random_cafe.to_dict())
+
+@app.route('/all', methods=['GET'])
+def all_cafes():
+    result = db.session.execute(db.select(Cafe))
+    all_cafes = result.scalars().all()
+    return jsonify([cafe.to_dict() for cafe in all_cafes])
 
 
 # HTTP POST - Create Record
