@@ -96,7 +96,7 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, current_user=current_user)
+    return render_template("make-post.html", form=add_post_form, current_user=add_post_form.author.data)
 
 # TODO: edit_post() to change an existing blog post
 
