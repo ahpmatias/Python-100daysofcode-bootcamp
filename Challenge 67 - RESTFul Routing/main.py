@@ -84,10 +84,19 @@ def show_post(post_id):
 @app.route('/new-post', methods=['GET','POST'])
 def add_new_post():
     add_post_form = AddPostForm()
-    # if request.method == 'POST':
-    #     data = request.form.get('ckeditor')  # <--
-
-    return render_template('make-post.html', form=add_post_form)
+    if add_post_form.validate_on_submit():
+        new_post = BlogPost(
+            title=add_post_form.title.data,
+            subtitle=add_post_form.subtitle.data,
+            body=add_post_form.body.data,
+            img_url=add_post_form.img_url.data,
+            author=add_post_form.author.data,
+            date=date.today().strftime("%B %d, %Y")
+        )
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for("get_all_posts"))
+    return render_template("make-post.html", form=form, current_user=current_user)
 
 # TODO: edit_post() to change an existing blog post
 
