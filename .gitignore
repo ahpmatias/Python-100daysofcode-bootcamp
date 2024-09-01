@@ -1,6 +1,6 @@
 /shelf/
 /workspace.xml
-venv/
+.venv/
 Challenge 32 - SMTP Library/mail_merging/.DS_Store
 Challenge 32 - SMTP Library/mail_merging/Input/.DS_Store
 Challenge 32 - SMTP Library/mail_merging/Output/.DS_Store
